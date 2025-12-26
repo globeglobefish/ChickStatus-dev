@@ -2,9 +2,9 @@
 FROM golang:1.21-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download || true
 COPY . ./
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /probe-agent ./cmd/agent
+RUN go mod tidy && CGO_ENABLED=0 go build -ldflags="-s -w" -o /probe-agent ./cmd/agent
 
 # Final image
 FROM alpine:3.19
