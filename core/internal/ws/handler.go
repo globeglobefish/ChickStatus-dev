@@ -137,10 +137,10 @@ func (h *Handler) ServeWS(w http.ResponseWriter, r *http.Request) {
 
 	// Create agent connection
 	agentConn := &AgentConn{
-		ID:   agent.ID,
-		Conn: conn,
-		Send: make(chan []byte, 256),
-		hub:  h.hub,
+		ID:       agent.ID,
+		Conn:     conn,
+		SendChan: make(chan []byte, 256),
+		hub:      h.hub,
 	}
 
 	h.hub.register <- agentConn

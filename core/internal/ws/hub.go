@@ -18,19 +18,19 @@ const (
 )
 
 type Hub struct {
-	agents     sync.Map // agentID -> *AgentConn
-	broadcast  chan []byte
-	register   chan *AgentConn
-	unregister chan *AgentConn
-	onMessage  func(agentID string, msg *protocol.Message)
-	onConnect  func(agentID string)
+	agents       sync.Map
+	broadcast    chan []byte
+	register     chan *AgentConn
+	unregister   chan *AgentConn
+	onMessage    func(agentID string, msg *protocol.Message)
+	onConnect    func(agentID string)
 	onDisconnect func(agentID string)
 }
 
 type AgentConn struct {
 	ID       string
 	Conn     *websocket.Conn
-	Send     chan []byte
+	SendChan chan []byte
 	hub      *Hub
 	mu       sync.Mutex
 	lastSeen time.Time
@@ -69,7 +69,7 @@ func (h *Hub) Run() {
 		case conn := <-h.unregister:
 			if _, ok := h.agents.Load(conn.ID); ok {
 				h.agents.Delete(conn.ID)
-				close(conn.Send)
+				close(conn.SendChan)
 				log.Printf("Agent disconnected: %s", conn.ID)
 				if h.onDisconnect != nil {
 					go h.onDisconnect(conn.ID)
@@ -80,10 +80,10 @@ func (h *Hub) Run() {
 			h.agents.Range(func(key, value interface{}) bool {
 				conn := value.(*AgentConn)
 				select {
-				case conn.Send <- message:
+				case conn.SendChan <- message:
 				default:
 					h.agents.Delete(key)
-					close(conn.Send)
+					close(conn.SendChan)
 				}
 				return true
 			})
@@ -110,7 +110,7 @@ func (h *Hub) SendToAgent(agentID string, msg *protocol.Message) error {
 	}
 
 	select {
-	case conn.Send <- data:
+	case conn.SendChan <- data:
 		return nil
 	default:
 		return nil
@@ -122,7 +122,6 @@ func (h *Hub) Broadcast(msg *protocol.Message) error {
 	if err != nil {
 		return err
 	}
-
 	h.broadcast <- data
 	return nil
 }
@@ -145,7 +144,6 @@ func (h *Hub) GetAgentCount() int {
 	return count
 }
 
-// AgentConn methods
 func (c *AgentConn) ReadPump() {
 	defer func() {
 		c.hub.unregister <- c
@@ -191,7 +189,7 @@ func (c *AgentConn) WritePump() {
 
 	for {
 		select {
-		case message, ok := <-c.Send:
+		case message, ok := <-c.SendChan:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -224,7 +222,7 @@ func (c *AgentConn) Send(msg *protocol.Message) error {
 	}
 
 	select {
-	case c.Send <- data:
+	case c.SendChan <- data:
 		return nil
 	default:
 		return nil
