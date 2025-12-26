@@ -42,11 +42,22 @@ tidy:
 	cd agent && go mod tidy
 
 docker-build:
-	docker build -f Dockerfile.core -t probe-core .
-	docker build -f Dockerfile.agent -t probe-agent .
+	docker build -t probe-core ./core
+	docker build -t probe-agent ./agent
+
+docker-build-core:
+	docker build -t probe-core ./core
+
+docker-build-agent:
+	docker build -t probe-agent ./agent
 
 docker-up:
 	docker-compose up -d
 
 docker-down:
 	docker-compose down
+
+# Remove .kiro from git cache (run this if .kiro was already committed)
+git-clean-kiro:
+	git rm -r --cached .kiro/
+	git commit -m "Remove .kiro from tracking"

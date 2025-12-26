@@ -35,6 +35,22 @@ npm install
 npm run build
 ```
 
+### Docker 构建
+
+```bash
+# 构建 Core 镜像 (在 core/ 目录下)
+docker build -t probe-core ./core
+
+# 构建 Agent 镜像 (在 agent/ 目录下)
+docker build -t probe-agent ./agent
+
+# 或使用 Makefile
+make docker-build
+
+# 使用 docker-compose 启动
+docker-compose up -d
+```
+
 ### 运行 Core
 
 ```bash

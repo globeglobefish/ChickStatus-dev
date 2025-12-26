@@ -1,6 +1,6 @@
 # Kiro IDE
 .kiro/
-
+.vscode/
 # Build output
 bin/
 dist/

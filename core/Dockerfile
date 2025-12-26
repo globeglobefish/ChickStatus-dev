@@ -1,18 +1,18 @@
 # Build frontend
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app/frontend
-COPY core/web/frontend/package*.json ./
+COPY web/frontend/package*.json ./
 RUN npm ci
-COPY core/web/frontend/ ./
+COPY web/frontend/ ./
 RUN npm run build
 
 # Build backend
 FROM golang:1.21-alpine AS backend-builder
 RUN apk add --no-cache gcc musl-dev
 WORKDIR /app
-COPY core/go.mod core/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
-COPY core/ ./
+COPY . ./
 RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /probe-core ./cmd/core
 
 # Final image

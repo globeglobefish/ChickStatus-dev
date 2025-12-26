@@ -3,8 +3,8 @@ version: '3.8'
 services:
   core:
     build:
-      context: .
-      dockerfile: Dockerfile.core
+      context: ./core
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     volumes:
@@ -17,8 +17,8 @@ services:
   # Example agent (uncomment to use)
   # agent:
   #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.agent
+  #     context: ./agent
+  #     dockerfile: Dockerfile
   #   environment:
   #     - SERVER_URL=ws://core:8080/ws/agent
   #     - TOKEN=your-agent-token
