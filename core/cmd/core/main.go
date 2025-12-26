@@ -95,6 +95,7 @@ func main() {
 	)
 	publicHandler := handler.NewPublicHandler(agentSvc, metricSvc, trafficSvc)
 	dashboardWSHandler := handler.NewDashboardWSHandler(agentSvc, metricSvc, trafficSvc)
+	scriptHandler := handler.NewScriptHandler(scriptSvc)
 
 	// Setup Gin router
 	gin.SetMode(gin.ReleaseMode)
@@ -117,6 +118,9 @@ func main() {
 
 	// Auth API
 	r.POST("/api/auth/login", adminHandler.Login)
+
+	// Script download API (for agents)
+	r.GET("/api/scripts/:id/content", scriptHandler.GetScriptContent)
 
 	// Admin API (protected)
 	admin := r.Group("/api/admin")

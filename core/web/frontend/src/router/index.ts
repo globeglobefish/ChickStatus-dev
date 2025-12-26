@@ -53,7 +53,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   if (to.path.startsWith('/admin')) {
     const token = localStorage.getItem('token')
     if (!token && to.name !== 'login') {

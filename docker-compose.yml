@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile.core
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json:ro
+    environment:
+      - PROBE_DB_PATH=/app/data/probe.db
+    restart: unless-stopped
+
+  # Example agent (uncomment to use)
+  # agent:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.agent
+  #   environment:
+  #     - SERVER_URL=ws://core:8080/ws/agent
+  #     - TOKEN=your-agent-token
+  #   depends_on:
+  #     - core
+  #   restart: unless-stopped
