@@ -64,7 +64,7 @@ func Load(path string) (*Config, error) {
 	}
 	if v := os.Getenv("PROBE_PORT"); v != "" {
 		var port int
-		if _, err := json.Unmarshal([]byte(v), &port); err == nil {
+		if err := json.Unmarshal([]byte(v), &port); err == nil {
 			config.Server.Port = port
 		}
 	}
