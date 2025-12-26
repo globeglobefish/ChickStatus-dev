@@ -2,7 +2,7 @@
 FROM node:18-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY web/frontend/package*.json ./
-RUN npm ci
+RUN npm install
 COPY web/frontend/ ./
 RUN npm run build
 
@@ -20,6 +20,6 @@ FROM alpine:3.19
 RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
 COPY --from=backend-builder /probe-core .
-COPY --from=frontend-builder /app/frontend/../dist ./web/dist
+COPY --from=frontend-builder /app/dist ./web/dist
 EXPOSE 8080
 CMD ["./probe-core"]
